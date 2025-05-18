@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Compensation Forecasting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-blue-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 shadow-lg">
+        <div class="container mx-auto">
+            <ul class="flex space-x-6 text-white font-semibold">
+                <li><a href="/" class="hover:text-blue-200 transition-colors">Employees</a></li>
+                <li><a href="/experience" class="hover:text-blue-200 transition-colors">Experience Distribution</a></li>
+                <li><a href="/simulation" class="hover:text-blue-200 transition-colors">Compensation Simulation</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Employee List</h1>
+        
+        <form th:action="@{/filter}" method="post" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Role</label>
+                    <select name="role" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Roles</option>
+                        <option th:each="role : ${roles}" th:value="${role}" th:text="${role}" th:selected="${role == param.role}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Location</label>
+                    <select name="location" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Locations</option>
+                        <option th:each="loc : ${locationsList}" th:value="${loc}" th:text="${loc}" th:selected="${loc == param.location}"></option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="includeInactive" th:checked="${includeInactive ?: false}" class="h-5 w-5 text-blue-600">
+                        <span class="text-gray-700 font-medium">Include Inactive</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mt-4 flex space-x-4">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Filter
+                </button>
+                <a th:href="@{/export(role=${role ?: ''},location=${location ?: ''},includeInactive=${includeInactive ?: false})}"
+                   class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    Export CSV
+                </a>
+            </div>
+        </form>
+
+        <div th:if="${avgCompensation != null}" class="mb-6 bg-white p-4 rounded-lg shadow-md">
+            <p class="text-lg text-gray-700">Average Compensation: <span th:text="${#numbers.formatDecimal(avgCompensation, 1, 2)}" class="font-semibold text-blue-600"></span></p>
+        </div>
+
+        <div th:if="${employees != null and employees.isEmpty()}" class="mb-6 text-red-600 bg-white p-4 rounded-lg shadow-md">
+            No employees found for the selected filters.
+        </div>
+
+        <canvas id="compChart" class="mb-8 bg-white p-4 rounded-lg shadow-md" th:unless="${locations == null or locations.isEmpty()}"></canvas>
+
+        <table class="w-full bg-white rounded-lg shadow-md" th:unless="${employees == null or employees.isEmpty()}">
+            <thead>
+                <tr class="bg-gray-200 text-gray-700">
+                    <th class="p-4 text-left">Name</th>
+                    <th class="p-4 text-left">Role</th>
+                    <th class="p-4 text-left">Location</th>
+                    <th class="p-4 text-left">Compensation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="emp : ${employees}" class="hover:bg-gray-50 transition-colors">
+                    <td class="p-4" th:text="${emp.name}"></td>
+                    <td class="p-4" th:text="${emp.role}"></td>
+                    <td class="p-4" th:text="${emp.location}"></td>
+                    <td class="p-4" th:text="${#numbers.formatDecimal(emp.compensation, 1, 2)}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const locations = /*[[${locations}]]*/ [];
+            if (locations && locations.length > 0) {
+                const ctx = document.getElementById('compChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: locations.map(l => l.location),
+                        datasets: [{
+                            label: 'Average Compensation',
+                            data: locations.map(l => l.avg_compensation),
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Compensation ($)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Location'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+            }
+            /*]]>*/
+        </script>
+    </div>
+</body>
+</html>

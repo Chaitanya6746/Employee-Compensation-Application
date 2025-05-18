@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Compensation Forecasting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto">
+            <ul class="flex space-x-4 text-white">
+                <li><a href="/" class="hover:underline">Employees</a></li>
+                <li><a href="/experience" class="hover:underline">Experience Distribution</a></li>
+                <li><a href="/simulation" class="hover:underline">Compensation Simulation</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div th:fragment="layout(content)" class="container mx-auto p-6">
+        <th:block th:insert="~{${content}}"></th:block>
+    </div>
+</body>
+</html>

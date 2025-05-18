@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Compensation Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-blue-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 shadow-lg">
+        <div class="container mx-auto">
+            <ul class="flex space-x-6 text-white font-semibold">
+                <li><a href="/" class="hover:text-blue-200 transition-colors">Employees</a></li>
+                <li><a href="/experience" class="hover:text-blue-200 transition-colors">Experience Distribution</a></li>
+                <li><a href="/simulation" class="hover:text-blue-200 transition-colors">Compensation Simulation</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Compensation Simulation</h1>
+        
+        <form th:action="@{/simulate}" method="post" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Global Increment (%)</label>
+                <input type="number" step="0.1" name="globalIncrement" 
+                       class="w-full md:w-1/4 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="0">
+            </div>
+
+            <table class="w-full bg-white rounded-lg shadow-md" th:unless="${employees == null or employees.isEmpty()}">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-700">
+                        <th class="p-4 text-left">Name</th>
+                        <th class="p-4 text-left">Current Compensation</th>
+                        <th class="p-4 text-left">Custom Increment (%)</th>
+                        <th class="p-4 text-left">New Compensation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="emp : ${employees}" class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4" th:text="${emp.name}"></td>
+                        <td class="p-4" th:text="${#numbers.formatDecimal(emp.compensation, 1, 2)}"></td>
+                        <td class="p-4">
+                            <input type="number" step="0.1" 
+                                   th:name="'customIncrement_' + ${emp.id}"
+                                   class="w-full border rounded-lg p-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </td>
+                        <td class="p-4" th:text="${emp.compensation != null ? #numbers.formatDecimal(emp.compensation, 1, 2) : ''}"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${employees == null or employees.isEmpty()}" class="mb-6 text-red-600 bg-white p-4 rounded-lg shadow-md">
+                No employees available for simulation.
+            </div>
+
+            <button type="submit" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Simulate
+            </button>
+        </form>
+    </div>
+</body>
+</html>

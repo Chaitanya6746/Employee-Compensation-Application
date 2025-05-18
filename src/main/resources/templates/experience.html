@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Experience Distribution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-blue-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 shadow-lg">
+        <div class="container mx-auto">
+            <ul class="flex space-x-6 text-white font-semibold">
+                <li><a href="/" class="hover:text-blue-200 transition-colors">Employees</a></li>
+                <li><a href="/experience" class="hover:text-blue-200 transition-colors">Experience Distribution</a></li>
+                <li><a href="/simulation" class="hover:text-blue-200 transition-colors">Compensation Simulation</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Experience Distribution</h1>
+        
+        <form th:action="@{/experience}" method="get" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+            <select name="groupBy" class="border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">All</option>
+                <option value="location">By Location</option>
+                <option value="role">By Role</option>
+            </select>
+            <button type="submit" class="ml-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Apply
+            </button>
+        </form>
+
+        <table class="w-full bg-white rounded-lg shadow-md" th:unless="${distributions == null or distributions.isEmpty()}">
+            <thead>
+                <tr class="bg-gray-200 text-gray-700">
+                    <th class="p-4 text-left">Experience Range</th>
+                    <th class="p-4 text-left">Group</th>
+                    <th class="p-4 text-left">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="dist : ${distributions}" class="hover:bg-gray-50 transition-colors">
+                    <td class="p-4" th:text="${dist.experience_range}"></td>
+                    <td class="p-4" th:text="${dist.group_field}"></td>
+                    <td class="p-4" th:text="${dist.employee_count}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${distributions == null or distributions.isEmpty()}" class="mb-6 text-red-600 bg-white p-4 rounded-lg shadow-md">
+            No distribution data available.
+        </div>
+    </div>
+</body>
+</html>
