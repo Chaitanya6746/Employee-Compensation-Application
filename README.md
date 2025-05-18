@@ -17,7 +17,7 @@ Database: MySQL with stored procedures
 Build Tool: Maven
 Language: Java 17
 
-Project Structure
+## Project Structure
 Employee-Compensation-Application/
 ├── pom.xml
 ├── src/
@@ -34,7 +34,7 @@ Employee-Compensation-Application/
 │   │   │   │   ├── experience.html
 │   │   │   │   ├── simulation.html
 │   │   │   ├── application.properties.template
-├── Employee.sql
+├── employee_comp.sql
 ├── .gitignore
 ├── README.md
 
